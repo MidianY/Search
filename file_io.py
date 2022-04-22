@@ -1,3 +1,4 @@
+
 """
 Provides functionality for reading from/writing to the 3 index files used by
 indexer and querier in search
@@ -111,3 +112,4 @@ def read_words_file(words: str, words_to_doc_relevance: dict):
                 if word not in words_to_doc_relevance:
                     words_to_doc_relevance[word] = {}
                 words_to_doc_relevance[word][page_id] = relevance
+
