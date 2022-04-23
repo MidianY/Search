@@ -16,9 +16,6 @@ class Index:
         self.nltk_test = PorterStemmer()
         self.parse(file_path)
 
-        #self.parsed_words = []
-        #words->ID->accounts
-
     def parse(self, input_file):
         wiki_tree = et.parse(input_file)
         wiki_xml_root = wiki_tree.getroot()
@@ -33,14 +30,10 @@ class Index:
             tokenization_regex = r"\[\[[^\[]+?\]\]|[a-zA-Z0-9]+'[a-zA-Z0-9]+|[a-zA-Z0-9]+"
             page_tokens = re.findall(tokenization_regex, title + " " + page_text)
         
-
             for word in page_tokens:
                 if (word.lower() in self.STOP_WORDS):
                     continue
                 word = self.nltk_test.stem(word)
-
-            # for word in parsed_words:
-            #     a_j = 0
 
                 if word in self.words_id_freq:
                     if pageID in self.words_id_freq[word]:
@@ -56,13 +49,6 @@ class Index:
                     self.words_id_freq[word][pageID] = 1
                 
 
-    # if __name__ == "__main__":
-    #     input = sys.argv 
-    #     file_path = "data"
-    #     titles_path = input[1]
-
-        
-            
 
 
 
