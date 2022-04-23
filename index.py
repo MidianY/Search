@@ -21,7 +21,6 @@ class Index:
         wiki_xml_root = wiki_tree.getroot()
 
         for wiki_page in wiki_xml_root:
-            parsed_words = set()
             title: str = wiki_page.find("title").text
             pageID: int = int(wiki_page.find('id').text)
             self.IDs_to_title[pageID] = title
@@ -47,9 +46,9 @@ class Index:
                     term_frequency = {}
                     term_frequency[pageID] = 1
                     self.words_id_freq[word][pageID] = 1
-                
+        
 
-
+#don't need to store the parsed words it takes up too much space we can already use our existing for loop
 
 
 
