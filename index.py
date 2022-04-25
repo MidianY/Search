@@ -1,5 +1,4 @@
 import re
-import sys
 import xml.etree.ElementTree as et  
 from nltk.stem import PorterStemmer 
 import nltk
@@ -42,9 +41,6 @@ class Index:
                 else:
                     if word not in self.words_id_freq:
                         self.words_id_freq[word] = {}
-
-                    term_frequency = {}
-                    term_frequency[pageID] = 1
                     self.words_id_freq[word][pageID] = 1
         
 
