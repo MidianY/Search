@@ -47,10 +47,10 @@ class Index:
                 word = self.nltk_test.stem(word)
 
                 #checking if it's a link
-                # if self.check_link(word):
-                #     link_title, link_text = self.split_link(word)
-                #     stem_word = self.nltk_test.stem(link_text)
-                #     word = stem_word
+                if self.check_link(word):
+                    link_title, link_text = self.split_link(word)
+                    stem_word = self.nltk_test.stem(link_text)
+                    word = stem_word
                 
                 if word in self.words_id_freq:
                     if pageID in self.words_id_freq[word]:
