@@ -2,11 +2,14 @@ from cmath import log, log10
 from distutils.log import Log
 import math
 import re
+import sys
 import xml.etree.ElementTree as et  
 from nltk.stem import PorterStemmer 
 import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
+from tqdm import tqdm
+import file_io
 
 
 class Index: 
@@ -19,7 +22,7 @@ class Index:
         self.word_to_id_to_tf = {}
         self.word_to_idf = {}
         self.word_to_doc_to_relevance = {}
-
+        self.id_to_link_freq = {}
         self.parse(file_path)
 
     def parse(self, input_file):
@@ -35,7 +38,7 @@ class Index:
             page_text = wiki_page.find("text").text 
             tokenization_regex = r"\[\[[^\[]+?\]\]|[a-zA-Z0-9]+'[a-zA-Z0-9]+|[a-zA-Z0-9]+"
             page_tokens = re.findall(tokenization_regex, title + " " + page_text)
-        
+
             aj = 0
             for word in page_tokens:
                 if (word.lower() in self.STOP_WORDS):
@@ -44,8 +47,7 @@ class Index:
 
                 if word in self.words_id_freq:
                     if pageID in self.words_id_freq[word]:
-                        self.words_id_freq[word][pageID] += 1
-                        
+                        self.words_id_freq[word][pageID] += 1        
                     else:
                         self.words_id_freq[word][pageID] = 1
                 
@@ -54,7 +56,6 @@ class Index:
                         self.words_id_freq[word] = {}
                     self.words_id_freq[word][pageID] = 1
                 
-
                 if self.words_id_freq[word][pageID] > aj:
                     aj = self.words_id_freq[word][pageID]
 
@@ -72,12 +73,35 @@ class Index:
         for word in self.word_to_idf:
             self.word_to_idf[word] = math.log(self.total_docs/self.word_to_idf[word])
         
-            
-    def relevance(self):
-        # for word in self.word_to_id_to_tf:
-        #     self.word_to_doc_to_relevance[word] = {}
-        #     for pageID in self.word_to_id_to_tf[word]:
-        #         self.word_to_doc_to_relevance[word][pageID] = self.word_to_idf[word]*self.word_to_id_to_tf[word][pageID]
+        for word in self.word_to_id_to_tf:
+            self.word_to_doc_to_relevance[word] = {}
+            for pageID in self.word_to_id_to_tf[word]:
+                self.word_to_doc_to_relevance[word][pageID] = self.word_to_idf[word]*self.word_to_id_to_tf[word][pageID]
+
+    def check_link(self, word):
+        link_regex = r"\[\[[^\[]+?\]\]|[a-zA-Z0-9]+'[a-zA-Z0-9]+|[a-zA-Z0-9]+"
+        return bool(re.match(link_regex, word))
+    
+    def split_link(self, word):
+        regex = r"[a-zA-Z0-9]+'[a-zA-Z0-9]+|[a-zA-Z0-9]+"
+        stripped_word = word[2:-2]
+
+        text = stripped_word
+        title = stripped_word
+
+        if "|" in stripped_word:
+            list = stripped_word.split("|")
+            title = list[0]
+            text = list[1]
+
+        return (re.findall(regex,text), title.strip())
+
+    def page_rank():
+        pass
+
+
+
+        
             
 
 
