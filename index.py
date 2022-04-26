@@ -19,7 +19,9 @@ class Index:
         self.word_to_idf = {}
         self.word_to_doc_to_relevance = {}
         self.id_to_link_freq = {}
+        
         self.parse(file_path)
+        self.relevance_calculation()
 
     def parse(self, input_file):
         wiki_tree = et.parse(input_file)
@@ -76,18 +78,9 @@ class Index:
                         self.word_to_idf[word] = 1
                     else: 
                         self.word_to_idf[word] += 1
-
-        #populating the idf dictionary by updating old values 
-        for word in self.word_to_idf:
-            self.word_to_idf[word] = math.log(self.total_docs/self.word_to_idf[word])
-        
-        #populating the relevance dictionary
-        for word in self.word_to_id_to_tf:
-            self.word_to_doc_to_relevance[word] = {}
-            for pageID in self.word_to_id_to_tf[word]:
-                self.word_to_doc_to_relevance[word][pageID] = self.word_to_idf[word]*self.word_to_id_to_tf[word][pageID]
-
+    
     def check_link(self, word):
+        #boolean that checks whether the word is a link
         link_regex = '''\[\[[^\[]+?\]\]'''
         return bool(re.match(link_regex, word))
     
@@ -103,6 +96,18 @@ class Index:
             title = list[0]
             text = list[1]
         return (re.findall(regex,text), title.strip())
+
+    def relevance_calculation(self):
+        '''method that populates the idf dictionary by updating old values and
+        calculates the corresponding relevance values using the idf and td dictionaaries'''
+
+        for word in self.word_to_idf:
+            self.word_to_idf[word] = math.log(self.total_docs/self.word_to_idf[word])
+        
+        for word in self.word_to_id_to_tf:
+            self.word_to_doc_to_relevance[word] = {}
+            for pageID in self.word_to_id_to_tf[word]:
+                self.word_to_doc_to_relevance[word][pageID] = self.word_to_idf[word]*self.word_to_id_to_tf[word][pageID]
 
     def page_rank():
         pass
