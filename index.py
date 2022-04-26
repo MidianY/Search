@@ -18,8 +18,8 @@ class Index:
         self.word_to_id_to_tf = {}
         self.word_to_idf = {}
         self.word_to_doc_to_relevance = {}
-        self.id_to_link_freq = {}
-        
+        self.id_to_linked_id = {}
+    
         self.parse(file_path)
         self.relevance_calculation()
 
@@ -50,8 +50,17 @@ class Index:
 
                 #checking if it's a link
                 if self.check_link(word):
-                    link_title, link_text = self.split_link(word)
-                    stem_word = self.nltk_test.stem(link_text)
+                    link_text, link_title = self.split_link(word)
+
+
+                    stem_word = self.nltk_test.stem(link_text[0])
+
+                    # for linked_ID in self.IDs_to_title:
+                    #     if self.IDs_to_title[linked_ID] == link_title:
+                    #         if not pageID in self.id_to_linked_id:
+                    #             self.id_to_linked_id[pageID] = set()
+                    #         self.id_to_linked_id[pageID].add(linked_ID)
+
                     word = stem_word
                 
                 if word in self.words_id_freq:
@@ -92,10 +101,20 @@ class Index:
         title = stripped_word
 
         if "|" in stripped_word:
-            list = stripped_word.split("|")
+            list = stripped_word.split("|", 1)
             title = list[0]
             text = list[1]
+
         return (re.findall(regex,text), title.strip())
+
+        # if ":" in stripped_word:
+        #     list = stripped_word.split(":")
+        #     return (re.findall(regex, list))
+            
+
+    def populate_word_to_id(self, word, pageID):
+        
+        
 
     def relevance_calculation(self):
         '''method that populates the idf dictionary by updating old values and
@@ -111,6 +130,10 @@ class Index:
 
     def page_rank():
         pass
+
+    def weight(self, k, j):
+        pass
+
 
     # #main method
     # if __name__ == "main_":
