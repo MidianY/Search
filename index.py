@@ -1,5 +1,3 @@
-from cmath import log, log10
-from distutils.log import Log
 import math
 import re
 import sys
@@ -8,8 +6,6 @@ from nltk.stem import PorterStemmer
 import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
-from tqdm import tqdm
-import file_io
 
 
 class Index: 
@@ -37,49 +33,62 @@ class Index:
 
             page_text = wiki_page.find("text").text 
             tokenization_regex = r"\[\[[^\[]+?\]\]|[a-zA-Z0-9]+'[a-zA-Z0-9]+|[a-zA-Z0-9]+"
-            page_tokens = re.findall(tokenization_regex, title + " " + page_text)
+
+            if page_text: #if the page exists
+                page_tokens = re.findall(tokenization_regex, title + " " + page_text)
 
             aj = 0
             for word in page_tokens:
+                #if the word is a stop word continue with the rest of the code
                 if (word.lower() in self.STOP_WORDS):
                     continue
+
+                #update the word to be the stemmed word to use in other loops 
                 word = self.nltk_test.stem(word)
 
+                #checking if it's a link
+                # if self.check_link(word):
+                #     link_title, link_text = self.split_link(word)
+                #     stem_word = self.nltk_test.stem(link_text)
+                #     word = stem_word
+                
                 if word in self.words_id_freq:
                     if pageID in self.words_id_freq[word]:
                         self.words_id_freq[word][pageID] += 1        
                     else:
                         self.words_id_freq[word][pageID] = 1
-                
                 else:
-                    if word not in self.words_id_freq:
-                        self.words_id_freq[word] = {}
+                    self.words_id_freq[word] = {}
                     self.words_id_freq[word][pageID] = 1
                 
                 if self.words_id_freq[word][pageID] > aj:
                     aj = self.words_id_freq[word][pageID]
 
+            #populating the tf dictionary
             for word in self.words_id_freq:
                 if pageID in self.words_id_freq[word]:
                     if not word in self.word_to_id_to_tf:
                         self.word_to_id_to_tf[word] = {}
                     self.word_to_id_to_tf[word][pageID] = self.words_id_freq[word][pageID]/aj
 
+                    #initially setting the idf to the number of times the word appears in all the documents 
                     if not word in self.word_to_idf:
                         self.word_to_idf[word] = 1
                     else: 
                         self.word_to_idf[word] += 1
 
+        #populating the idf dictionary by updating old values 
         for word in self.word_to_idf:
             self.word_to_idf[word] = math.log(self.total_docs/self.word_to_idf[word])
         
+        #populating the relevance dictionary
         for word in self.word_to_id_to_tf:
             self.word_to_doc_to_relevance[word] = {}
             for pageID in self.word_to_id_to_tf[word]:
                 self.word_to_doc_to_relevance[word][pageID] = self.word_to_idf[word]*self.word_to_id_to_tf[word][pageID]
 
     def check_link(self, word):
-        link_regex = r"\[\[[^\[]+?\]\]|[a-zA-Z0-9]+'[a-zA-Z0-9]+|[a-zA-Z0-9]+"
+        link_regex = '''\[\[[^\[]+?\]\]'''
         return bool(re.match(link_regex, word))
     
     def split_link(self, word):
@@ -93,11 +102,24 @@ class Index:
             list = stripped_word.split("|")
             title = list[0]
             text = list[1]
-
         return (re.findall(regex,text), title.strip())
 
     def page_rank():
         pass
+
+    # #main method
+    # if __name__ == "main_":
+    #     input = sys.argv
+    #     print(input)
+    #     file_path = "data"
+    #     titles_path = input[1]
+    #     docs_path = input[2]
+    #     words_path = input[3]
+    #     aClass = Index(file_path, titles_path, docs_path, words_path)
+
+
+    
+        
 
 
 
