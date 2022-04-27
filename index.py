@@ -8,6 +8,7 @@ import nltk
 from snowballstemmer import stemmer
 nltk.download('stopwords')
 from nltk.corpus import stopwords
+import numpy as np 
 
 
 class Index: 
@@ -160,23 +161,27 @@ class Index:
         else:
             return e/n
 
+    def distance(old_r, new_r):
+        sum = 0 
+        for id in old_r:
+            sum += math.pow(new_r[id]-old_r[id], 2)
+        return math.sqrt(sum) 
+
     def page_rank(self):
         r = {}
 
         for x in self.IDs_to_title.keys():
             r[x] = 0
             self.id_to_page_rank[x] = 1/len(self.IDs_to_title)
-            
-
-        print(self.id_to_page_rank)
+        
         while math.dist(r.values(), self.id_to_page_rank.values()) > 0.0001:
             r = self.id_to_page_rank.copy()
 
             for j in self.IDs_to_title.keys():
                 self.id_to_page_rank[j] = 0
                 for k in self.IDs_to_title.keys():
-                    self.id_to_page_rank[j] += (self.weight(k,j)*r[k])
-    
+                    self.id_to_page_rank[j] = self.id_to_page_rank[j] + (self.weight(k,j)*r[k])
+
 
     # #main method
     # if __name__ == "main_":
@@ -187,11 +192,6 @@ class Index:
     #     docs_path = input[2]
     #     words_path = input[3]
     #     aClass = Index(file_path, titles_path, docs_path, words_path)
-
-
-    
-        
-
 
 
         
