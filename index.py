@@ -4,6 +4,7 @@ import sys
 import xml.etree.ElementTree as et  
 from nltk.stem import PorterStemmer 
 import nltk
+from snowballstemmer import stemmer
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 
@@ -41,53 +42,46 @@ class Index:
 
             aj = 0
             for word in page_tokens:
-                #if the word is a stop word continue with the rest of the code
-                if (word.lower() in self.STOP_WORDS):
-                    continue
-
-                #update the word to be the stemmed word to use in other loops 
-                word = self.nltk_test.stem(word)
-
+                
+                
                 #checking if it's a link
                 if self.check_link(word):
                     link_text, link_title = self.split_link(word)
 
+                    for linked_ID in self.IDs_to_title:
+                        if self.IDs_to_title[linked_ID] == link_title:
+                            if not pageID in self.id_to_linked_id:
+                                self.id_to_linked_id[pageID] = set()
+                            self.id_to_linked_id[pageID].add(linked_ID)
 
-                    stem_word = self.nltk_test.stem(link_text[0])
+                    for text in link_text:
+                        text = self.process(text)
+                        if text == "":
+                            continue
+                        aj = self.populate_word_to_id(text, pageID, aj)
 
-                    # for linked_ID in self.IDs_to_title:
-                    #     if self.IDs_to_title[linked_ID] == link_title:
-                    #         if not pageID in self.id_to_linked_id:
-                    #             self.id_to_linked_id[pageID] = set()
-                    #         self.id_to_linked_id[pageID].add(linked_ID)
-
-                    word = stem_word
-                
-                if word in self.words_id_freq:
-                    if pageID in self.words_id_freq[word]:
-                        self.words_id_freq[word][pageID] += 1        
-                    else:
-                        self.words_id_freq[word][pageID] = 1
                 else:
-                    self.words_id_freq[word] = {}
-                    self.words_id_freq[word][pageID] = 1
+                    word = self.process(word)
+                    if word == "":
+                        continue
+                    aj = self.populate_word_to_id(word, pageID, aj)
                 
-                if self.words_id_freq[word][pageID] > aj:
-                    aj = self.words_id_freq[word][pageID]
-
-            #populating the tf dictionary
-            for word in self.words_id_freq:
-                if pageID in self.words_id_freq[word]:
-                    if not word in self.word_to_id_to_tf:
-                        self.word_to_id_to_tf[word] = {}
-                    self.word_to_id_to_tf[word][pageID] = self.words_id_freq[word][pageID]/aj
-
-                    #initially setting the idf to the number of times the word appears in all the documents 
-                    if not word in self.word_to_idf:
-                        self.word_to_idf[word] = 1
-                    else: 
-                        self.word_to_idf[word] += 1
+            
+            self.tf_idf(pageID, aj)
     
+    def process(self, word):
+        #method that handles processing a word
+        #lowercase
+        lower_case = word.lower()
+
+        #stopwords
+        if lower_case in self.STOP_WORDS:
+            return ""
+
+        #stemming
+        return self.nltk_test.stem(lower_case)
+
+
     def check_link(self, word):
         #boolean that checks whether the word is a link
         link_regex = '''\[\[[^\[]+?\]\]'''
@@ -112,9 +106,36 @@ class Index:
         #     return (re.findall(regex, list))
             
 
-    def populate_word_to_id(self, word, pageID):
-        
-        
+    def populate_word_to_id(self, word, pageID, aj):
+        if word in self.words_id_freq:
+            if pageID in self.words_id_freq[word]:
+                self.words_id_freq[word][pageID] += 1        
+            else:
+                self.words_id_freq[word][pageID] = 1
+        else:
+            self.words_id_freq[word] = {}
+            self.words_id_freq[word][pageID] = 1
+
+        if self.words_id_freq[word][pageID] > aj:
+            aj = self.words_id_freq[word][pageID]
+
+        return aj
+            
+    def tf_idf(self, pageID, aj):
+
+        #populating the tf dictionary
+        for word in self.words_id_freq:
+            if pageID in self.words_id_freq[word]:
+                if not word in self.word_to_id_to_tf:
+                    self.word_to_id_to_tf[word] = {}
+                self.word_to_id_to_tf[word][pageID] = self.words_id_freq[word][pageID]/aj
+
+                #initially setting the idf to the number of times the word appears in all the documents 
+                if not word in self.word_to_idf:
+                    self.word_to_idf[word] = 1
+                else: 
+                    self.word_to_idf[word] += 1
+
 
     def relevance_calculation(self):
         '''method that populates the idf dictionary by updating old values and
