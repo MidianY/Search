@@ -1,4 +1,5 @@
 import math
+from operator import contains
 import re
 import sys
 import xml.etree.ElementTree as et  
@@ -20,9 +21,11 @@ class Index:
         self.word_to_idf = {}
         self.word_to_doc_to_relevance = {}
         self.id_to_linked_id = {}
+        self.id_to_page_rank = {}
     
         self.parse(file_path)
         self.relevance_calculation()
+        self.page_rank()
 
     def parse(self, input_file):
         wiki_tree = et.parse(input_file)
@@ -42,7 +45,6 @@ class Index:
 
             aj = 0
             for word in page_tokens:
-                
                 
                 #checking if it's a link
                 if self.check_link(word):
@@ -66,7 +68,6 @@ class Index:
                         continue
                     aj = self.populate_word_to_id(word, pageID, aj)
                 
-            
             self.tf_idf(pageID, aj)
     
     def process(self, word):
@@ -80,7 +81,6 @@ class Index:
 
         #stemming
         return self.nltk_test.stem(lower_case)
-
 
     def check_link(self, word):
         #boolean that checks whether the word is a link
@@ -104,7 +104,7 @@ class Index:
         # if ":" in stripped_word:
         #     list = stripped_word.split(":")
         #     return (re.findall(regex, list))
-            
+        
 
     def populate_word_to_id(self, word, pageID, aj):
         if word in self.words_id_freq:
@@ -118,11 +118,9 @@ class Index:
 
         if self.words_id_freq[word][pageID] > aj:
             aj = self.words_id_freq[word][pageID]
-
         return aj
             
     def tf_idf(self, pageID, aj):
-
         #populating the tf dictionary
         for word in self.words_id_freq:
             if pageID in self.words_id_freq[word]:
@@ -136,7 +134,6 @@ class Index:
                 else: 
                     self.word_to_idf[word] += 1
 
-
     def relevance_calculation(self):
         '''method that populates the idf dictionary by updating old values and
         calculates the corresponding relevance values using the idf and td dictionaaries'''
@@ -149,12 +146,37 @@ class Index:
             for pageID in self.word_to_id_to_tf[word]:
                 self.word_to_doc_to_relevance[word][pageID] = self.word_to_idf[word]*self.word_to_id_to_tf[word][pageID]
 
-    def page_rank():
-        pass
-
     def weight(self, k, j):
-        pass
+        e = 0.15
+        n = len(self.IDs_to_title)
+    
+        if k == j or not j in self.IDs_to_title.keys():
+            return 0
+        elif not k in self.id_to_linked_id:
+            return (e/n) + (1-e)*(1/(n-1))
+        
+        elif j in self.id_to_linked_id[k]:
+            return (e/n) + (1-e)*(1/(len(self.id_to_linked_id[k])))
+        else:
+            return e/n
 
+    def page_rank(self):
+        r = {}
+
+        for x in self.IDs_to_title.keys():
+            r[x] = 0
+            self.id_to_page_rank[x] = 1/len(self.IDs_to_title)
+            
+
+        print(self.id_to_page_rank)
+        while math.dist(r.values(), self.id_to_page_rank.values()) > 0.0001:
+            r = self.id_to_page_rank.copy()
+
+            for j in self.IDs_to_title.keys():
+                self.id_to_page_rank[j] = 0
+                for k in self.IDs_to_title.keys():
+                    self.id_to_page_rank[j] += (self.weight(k,j)*r[k])
+    
 
     # #main method
     # if __name__ == "main_":

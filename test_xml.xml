@@ -12,7 +12,16 @@
         <title>Hi Again</title>
         <id>1</id>  
         <text>
-        Hi again! It is [[Welcome| do wonderful]] to see you again, ok [[bye]].
+        Hi again! It is [[Welcome| camp jump wonderful]] to see you again, ok [[bye]].
+        </text>
+    </page>
+
+     <page>
+
+        <title>Hi</title>
+        <id>2</id>  
+        <text>
+        [[Hi Again | jump]]
         </text>
     </page>
 </xml>
