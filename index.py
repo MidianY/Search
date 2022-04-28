@@ -4,13 +4,13 @@ import sys
 import xml.etree.ElementTree as et  
 from nltk.stem import PorterStemmer 
 import nltk
-from snowballstemmer import stemmer
+# from snowballstemmer import stemmer
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 import numpy as np 
 
 
-class Index: 
+class Index:
 
     def __init__(self, file_path, titles_path, docs_path, words_path):
         self.STOP_WORDS = set(stopwords.words('english'))
@@ -101,10 +101,6 @@ class Index:
 
         return (re.findall(regex,text), title.strip())
 
-        # if ":" in stripped_word:
-        #     list = stripped_word.split(":")
-        #     return (re.findall(regex, list))
-
 
     def populate_word_to_id(self, word, pageID, aj):
         if word in self.words_id_freq:
@@ -155,7 +151,7 @@ class Index:
         elif k not in self.id_to_linked_id:
             return (e/n) + (1-e)*(1/(n-1))
         elif j in self.id_to_linked_id[k]:
-            return (e/n) + (1-e)*(1/(len(self.id_to_linked_id[k])))
+            return (e/n) + (1-e)*(1/(len(self.id_thelpo_linked_id[k])))
         else:
             return e/n
 
@@ -168,6 +164,7 @@ class Index:
     def page_rank(self):
         r = {}
         #r prime is going to be our id to page rank dicrionary 
+
         for x in self.IDs_to_title.keys():
             r[x] = 0
             self.id_to_page_rank[x] = 1/len(self.IDs_to_title)
@@ -179,19 +176,7 @@ class Index:
                 self.id_to_page_rank[j] = 0
                 for k in self.IDs_to_title.keys():
                     self.id_to_page_rank[j] = self.id_to_page_rank[j] + (self.weight(k,j)*r[k])
-
-    # #main method
-        if __name__ == "main_":
-            input = sys.argv
-            print(input)
-            file_path = "data"
-            titles_path = input[1]
-            docs_path = input[2]
-            words_path = input[3]
-            aClass = Index(file_path, titles_path, docs_path, words_path)
-
-
-        
+            
             
 
 
