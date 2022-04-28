@@ -1,5 +1,4 @@
 import math
-from operator import contains
 import re
 import sys
 import xml.etree.ElementTree as et  
@@ -151,11 +150,10 @@ class Index:
         e = 0.15
         n = len(self.IDs_to_title)
     
-        if k == j or not j in self.IDs_to_title.keys():
-            return 0
-        elif not k in self.id_to_linked_id:
+        if k == j:
+            return e/n
+        elif k not in self.id_to_linked_id:
             return (e/n) + (1-e)*(1/(n-1))
-        
         elif j in self.id_to_linked_id[k]:
             return (e/n) + (1-e)*(1/(len(self.id_to_linked_id[k])))
         else:

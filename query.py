@@ -7,4 +7,4 @@ class Query:
             if inputs == ":quit":
                 break
             print(inputs.upper())
-            print(inputs.getQuery().upper())
+            print(inputs.get_query().upper())
