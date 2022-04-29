@@ -1,6 +1,7 @@
 import math
 import re
 import sys
+from file_io import *
 import xml.etree.ElementTree as et  
 from nltk.stem import PorterStemmer 
 import nltk
@@ -11,7 +12,6 @@ import numpy as np
 
 
 class Index:
-
     def __init__(self, file_path, titles_path, docs_path, words_path):
         self.STOP_WORDS = set(stopwords.words('english'))
         self.IDs_to_title = {}
@@ -22,10 +22,13 @@ class Index:
         self.word_to_doc_to_relevance = {}
         self.id_to_linked_id = {}
         self.id_to_page_rank = {}
-    
         self.parse(file_path)
         self.relevance_calculation()
         self.page_rank()
+        write_title_file(titles_path, self.IDs_to_title)
+        write_docs_file(docs_path, self.id_to_page_rank)
+        write_words_file(words_path, self.word_to_doc_to_relevance)
+
 
     def parse(self, input_file):
         wiki_tree = et.parse(input_file)
@@ -151,7 +154,7 @@ class Index:
         elif k not in self.id_to_linked_id:
             return (e/n) + (1-e)*(1/(n-1))
         elif j in self.id_to_linked_id[k]:
-            return (e/n) + (1-e)*(1/(len(self.id_thelpo_linked_id[k])))
+            return (e/n) + (1-e)*(1/(len(self.id_to_linked_id[k])))
         else:
             return e/n
 
@@ -175,10 +178,21 @@ class Index:
             for j in self.IDs_to_title.keys():
                 self.id_to_page_rank[j] = 0
                 for k in self.IDs_to_title.keys():
-                    self.id_to_page_rank[j] = self.id_to_page_rank[j] + (self.weight(k,j)*r[k])
+                    self.id_to_page_rank[j] = self.id_to_page_rank[j] + (self.weight(k,j)*r[k]) 
             
-            
+if __name__ == "__main__":
+    input = sys.argv
+    wiki_data = input[1]
+    title_path = input[2]
+    docs_path = input[3]
+    words_path = input[4]
+    Index(wiki_data, title_path, docs_path, words_path)
 
+# SmallWiki.xml, "title.txt", "doc.txt", "word.txt"
+# "--pagerank", "title.txt", "doc.txt", "word.txt"
+
+#take out brackets for pagerank 
+# no need for quotations 
 
 
 

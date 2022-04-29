@@ -1,20 +1,20 @@
-from audioop import reverse
 from file_io import *
 from index import *
 from nltk.stem import PorterStemmer 
 import nltk
+import sys
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 
 class Query:
-    def __init__(self, title, doc_file, word_file):
+    def __init__(self, title, doc_file, word_file, pageRank):
         self.ids_to_titles = {}
         self.ids_to_pageranks = {}
         self.words_to_doc_relevance = {}
+        self.use_pagerank = pageRank
         read_title_file(title, self.ids_to_titles)
         read_docs_file(doc_file, self.ids_to_pageranks)
         read_words_file(word_file, self.words_to_doc_relevance)
-
 
     def get_query(self, inputs):
         page_id_to_relevance = {}
@@ -46,12 +46,30 @@ class Query:
 
     def my_function(e):
         return e[1]
+    
+    def repl(self):
+        while True:
+            print(sys.argv)
+            inputs = input("Enter an input: ")
+            if inputs == ":quit":
+                break
+            print(self.get_query(inputs.lower()))
+        
 
-    if __name__ == "__main__":
-            while True:
-                inputs = input("Enter an input: ")
-                if inputs == ":quit":
-                    break
-                print(inputs.lower())
-                print(get_query(inputs.lower()))
+if __name__ == "__main__":
+    use_pagerank = False
+
+    if len(sys.argv) == 5 and sys.argv[1] == "--pagerank":
+        query = Query(sys.argv[1], sys.argv[2], sys.argv[3], True)
+        query.repl()
+    
+    else: 
+        query = Query(sys.argv[1], sys.argv[2], sys.argv[3], False)
+        query.repl()
+   
+    
+
+
+        
+            
     
