@@ -5,7 +5,6 @@ from file_io import *
 import xml.etree.ElementTree as et  
 from nltk.stem import PorterStemmer 
 import nltk
-# from snowballstemmer import stemmer
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 import numpy as np 
@@ -187,6 +186,7 @@ if __name__ == "__main__":
     docs_path = input[3]
     words_path = input[4]
     Index(wiki_data, title_path, docs_path, words_path)
+
 
 # SmallWiki.xml, "title.txt", "doc.txt", "word.txt"
 # "--pagerank", "title.txt", "doc.txt", "word.txt"
