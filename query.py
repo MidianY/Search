@@ -13,6 +13,7 @@ class Query:
         self.words_to_doc_relevance = {}
         self.page_id_to_relevance = {}
         self.use_pagerank = pageRank
+        self.nltk_test = PorterStemmer()
         read_title_file(title, self.ids_to_titles)
         read_docs_file(doc_file, self.ids_to_pageranks)
         read_words_file(word_file, self.words_to_doc_relevance)
@@ -28,7 +29,7 @@ class Query:
     def stem_words(self, word):
         if word.lower() in set(stopwords.words('english')):
             return ""
-        return PorterStemmer.stem(word.lower())
+        return self.nltk_test.stem(word.lower())
 
     def get_query(self, query):
         split_input = query.split(" ")
@@ -51,16 +52,15 @@ class Query:
         num_results = min(10, len(all_id))
 
         for i in range(num_results):
-            print((i+1)+ self.ids_to_titles[all_id[i]])
+            print(self.ids_to_titles[all_id[i]])
     
     def repl(self):
         while True:
-            print(sys.argv)
-            inputs = input("Enter an input: ")
+            #print(sys.argv)
+            inputs = input("search: ")
             if inputs == ":quit":
                 break
-            print(self.get_query(inputs.lower()))
-        
+            self.get_query(inputs.lower())
 
 if __name__ == "__main__":
     if len(sys.argv) == 5 and sys.argv[1] == "--pagerank":
@@ -74,10 +74,6 @@ if __name__ == "__main__":
         query.repl()
     else:
         print("wrong arguments, please try again")
-   
-    
 
-
-        
             
     

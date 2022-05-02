@@ -36,8 +36,9 @@ class Index:
 
         for wiki_page in wiki_xml_root:
             title: str = wiki_page.find("title").text
+            # title.strip()
             pageID: int = int(wiki_page.find('id').text)
-            self.IDs_to_title[pageID] = title
+            self.IDs_to_title[pageID] = title.strip()
 
             page_text = wiki_page.find("text").text 
             tokenization_regex = r"\[\[[^\[]+?\]\]|[a-zA-Z0-9]+'[a-zA-Z0-9]+|[a-zA-Z0-9]+"
@@ -138,7 +139,7 @@ class Index:
 
         for word in self.word_to_idf:
             self.word_to_idf[word] = math.log(self.total_docs/self.word_to_idf[word])
-        
+
         for word in self.word_to_id_to_tf:
             self.word_to_doc_to_relevance[word] = {}
             for pageID in self.word_to_id_to_tf[word]:
