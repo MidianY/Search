@@ -17,6 +17,8 @@ class Query:
         read_title_file(title, self.ids_to_titles)
         read_docs_file(doc_file, self.ids_to_pageranks)
         read_words_file(word_file, self.words_to_doc_relevance)
+        
+        
 
     def find_score(self, word):
         if word in self.words_to_doc_relevance:

@@ -28,7 +28,6 @@ class Index:
         write_docs_file(docs_path, self.id_to_page_rank)
         write_words_file(words_path, self.word_to_doc_to_relevance)
 
-
     def parse(self, input_file):
         wiki_tree = et.parse(input_file)
         wiki_xml_root = wiki_tree.getroot()
@@ -36,7 +35,6 @@ class Index:
 
         for wiki_page in wiki_xml_root:
             title: str = wiki_page.find("title").text
-            # title.strip()
             pageID: int = int(wiki_page.find('id').text)
             self.IDs_to_title[pageID] = title.strip()
 
@@ -104,7 +102,6 @@ class Index:
 
         return (re.findall(regex,text), title.strip())
 
-
     def populate_word_to_id(self, word, pageID, aj):
         if word in self.words_id_freq:
             if pageID in self.words_id_freq[word]:
@@ -120,6 +117,7 @@ class Index:
         return aj
             
     def tf_idf(self, pageID, aj):
+
         #populating the tf dictionary
         for word in self.words_id_freq:
             if pageID in self.words_id_freq[word]:
@@ -188,12 +186,6 @@ if __name__ == "__main__":
     words_path = input[4]
     Index(wiki_data, title_path, docs_path, words_path)
 
-
-# SmallWiki.xml, "title.txt", "doc.txt", "word.txt"
-# "--pagerank", "title.txt", "doc.txt", "word.txt"
-
-#take out brackets for pagerank 
-# no need for quotations 
 
 
 

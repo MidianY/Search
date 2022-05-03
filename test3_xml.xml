@@ -1,7 +1,7 @@
 <xml>
   <page>
     <title>
-      Page 1
+      First
     </title>
     <id>
       1
@@ -12,7 +12,7 @@
   </page>
   <page>
     <title>
-	  Page 2
+	  Second
 	</title>
 	<id>
 	  2
@@ -23,7 +23,7 @@
   </page>
   <page>
     <title>
-	  Page 3
+	  Third
 	</title>
 	<id>
 	  3

@@ -4,6 +4,7 @@
         <id>0</id>
         <text>
         Hello! This is our [Hi Again xml file]. It is nice to have you here. I wonder what brought you :)
+        I hope you are eating well can come. 
         </text>
     </page>
 
@@ -12,7 +13,8 @@
         <title>Hi Again</title>
         <id>1</id>  
         <text>
-        Hi again! It is [[Welcome| camp jump wonderful]] to see you again, ok [[bye]].
+        Hi again! It is [[Welcome| camp jump wonderful]] to see you again, ok [[bye]]. I am 
+        excited to be here thank you for doing all that you do.
         </text>
     </page>
 
