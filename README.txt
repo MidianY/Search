@@ -6,9 +6,7 @@ Group members:
 Midian Yoseph and Razan Karar
 
 Known Bugs:
--We experienced issues with our pagerank. We seem to get correct results for the first pagerank example given in the handout but when we tested it on the other ones our numbers were quite small and they do not add up to 1
-- We thought the source of this issue was that we were not properly checking all edgecases for our weight calculations but in the end we believe we thought of all the necessary edge cases associated with it. This led us to examine
-if we were checking/identifying links properly and properly populating our dicrionary that maps from pageID's to a set of the pages it has linked. We ran unit tests and found we were checking for links properly and ran through our debugger to find our linked id dictionary was also populating properly, so ultimately we could not solve this bug. 
+None
 
 Instructions for Use:
 Begin by copying this line into your terminal, you can replace MedWiki.xml with any xml file of your choice
@@ -219,8 +217,8 @@ How the Pieces of the Program Fit together:
 - Most of the logic of this program is contained within the Index class. This class goes through all the documents and populated important dictionaries which it uses to create three files: a titles, doc, and word file. The title txt holds all of the titles of the wiki pages along with their associated pageID's, the doc txt contains all of the words along with their pageID and their calculated relevance scores. The index creates and stores alll this information so that once the Query class is ran then it produces results based on a search within seconds. It can easily access the infromation it needs to because the Index class did all the work in properly storing it. 
 
 Features we failed to Implement/Features we added:
-- We failed to properly finish pagerank, although it works on some documents, we struggled to get it to work for all edge cases. As outlined in the 'Known Bugs' section we could not figure out where our issuefor pagerank was coming from 
 - Our program was storing a lot of things so a design choice we had was to not store our max count, aj, in a dictionary. We felt that our space could be better used for something else. Instead we thought to pass in aj into one of our helper methods that was populating our word_id_to_freq dictionary methods. Because this method was being called for each new word we knew that the max value rather than being stored could be updated with each iteration and then that value at that instant can then be used to populate our tf and idf dictionaries. 
+-Additionally, to save memory we also thought it was best to calculate our weights in a method rather than storing it in a dictionary. For each pagerank calcuation, our weight method would calculate the weight between 2 pages for each iteration.
 
 
 

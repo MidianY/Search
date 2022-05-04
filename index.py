@@ -7,15 +7,18 @@ from nltk.stem import PorterStemmer
 import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
-import numpy as np 
-
 
 class Index:
+    '''This class is responsible for writing three files, a title, doc and word file that the Query class will use to generate relevent results for a search'''
+
     def __init__(self, file_path, titles_path, docs_path, words_path):
+        '''This is the constructor of the Index class, it instanitates all of the empty dictionaries that this class will populate along with method calls that populate them; instance variables of things used throughout the program are also stored here. After all of the dictionaries below have been populate we use the file_io to write three txt files containing information from three of our dictionaries 
+        '''
+
         self.STOP_WORDS = set(stopwords.words('english'))
+        self.nltk_test = PorterStemmer()
         self.IDs_to_title = {}
         self.words_id_freq = {}
-        self.nltk_test = PorterStemmer()
         self.word_to_id_to_tf = {}
         self.word_to_idf = {}
         self.word_to_doc_to_relevance = {}
@@ -132,7 +135,7 @@ class Index:
         Parameters: a word, its associated pageID, and the max word count for that pageID
         
         Returns: The max count of a word for that pageID'''
-        
+
         if word in self.words_id_freq:
             if pageID in self.words_id_freq[word]:
                 self.words_id_freq[word][pageID] += 1        
@@ -147,6 +150,11 @@ class Index:
         return aj
             
     def tf_idf(self, pageID, aj):
+        '''This method is responsible for populating our tf and idf dictionaries. Based on words in the words_id_freq it calculated tf and idf and accordingly. This method is called in parse so that with each iteration it is taking in the max value of the page at that instant
+        
+        Parameters: the pageID for a given page and the max count of a word for that page
+        
+        Returns: None'''
 
         #populating the tf dictionary
         for word in self.words_id_freq:
@@ -162,10 +170,8 @@ class Index:
                     self.word_to_idf[word] += 1
 
     def relevance_calculation(self):
-        '''method that populates the idf dictionary by updating old values and
-        calculates the corresponding relevance values using the idf and td dictionaries
+        '''This method that populates the idf dictionary by updating old values and calculates the corresponding relevance values using the idf and td dictionaries.
         '''
-
         for word in self.word_to_idf:
             self.word_to_idf[word] = math.log(self.total_docs/self.word_to_idf[word])
 
@@ -175,6 +181,12 @@ class Index:
                 self.word_to_doc_to_relevance[word][pageID] = self.word_to_idf[word]*self.word_to_id_to_tf[word][pageID]
 
     def weight(self, k, j):
+        '''This method handles calculates the weight for a given page, it checks the necessary edgecases outline for how associated links should be weighed and does the corresponding calculation
+        
+        Parameters: 2 pages, k and j
+        
+        Returns: the weight that page k gives to page j '''
+
         e = 0.15
         n = len(self.IDs_to_title)
     
@@ -188,12 +200,15 @@ class Index:
             return e/n
 
     def distance(self, old_r, new_r):
+        '''Helper method that calculates the euclidian distance between two ranks'''
         sum = 0
         for id in old_r:
             sum += math.pow(new_r[id]-old_r[id], 2)
         return bool(math.sqrt(sum) > 0.001)
 
     def page_rank(self):
+        '''Method that calculates the pagerank of a given page finding which pages are relevant to a query  by comparing the terms in the query to those in the documents; it utilizes helper methods to calcuate the weights and along with making sure that r and r' stabilize. '''
+
         r = {}
         #r prime is going to be our id to page rank dicrionary 
 
@@ -210,6 +225,7 @@ class Index:
                     self.id_to_page_rank[k] = self.id_to_page_rank[k] + (self.weight(j,k)*r[j]) 
             
 if __name__ == "__main__":
+    '''Main method, instantiates index given sys args'''
     input = sys.argv
     wiki_data = input[1]
     title_path = input[2]
