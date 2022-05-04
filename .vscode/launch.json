@@ -29,7 +29,7 @@
             "request": "launch",
             "cwd": "/Users/midianyoseph/Desktop/cs200/projects/search-MidianY-rakar20",
             "program": "query.py",
-            "args": ["title.txt", "doc.txt", "word.txt", "pageRank"],
+            "args": ["t.txt", "d.txt", "w.txt"],
             "console": "integratedTerminal"
         }
     ]

@@ -29,6 +29,11 @@ class Index:
         write_words_file(words_path, self.word_to_doc_to_relevance)
 
     def parse(self, input_file):
+        '''
+        Parameters:
+
+        Returns: it doesn't return anthing but populates dictionaries 
+        '''
         wiki_tree = et.parse(input_file)
         wiki_xml_root = wiki_tree.getroot()
         self.total_docs = len(wiki_xml_root)
@@ -72,19 +77,26 @@ class Index:
             self.tf_idf(pageID, aj)
     
     def process(self, word):
-        #method that handles processing a word
-        #lowercase
-        lower_case = word.lower()
+        '''
+        Method handles processing words by making it lowercase, stemming, and 
+        removing stopwords
 
-        #stopwords
+        Parameters: a word/phase 
+        
+        Returns: the word or phrase after it is stemmed, stop words are removed,
+        and lowercase'''
+
+        lower_case = word.lower()
         if lower_case in self.STOP_WORDS:
             return ""
-
-        #stemming
         return self.nltk_test.stem(lower_case)
 
     def check_link(self, word):
-        #boolean that checks whether the word is a link
+        '''method checks whether a word is a link
+        Parameters: a word
+        
+        Returns: a boolean that checks whether the word is a link'''
+      
         link_regex = '''\[\[[^\[]+?\]\]'''
         return bool(re.match(link_regex, word))
     
@@ -150,6 +162,7 @@ class Index:
         if k == j:
             return e/n
         elif k not in self.id_to_linked_id:
+            print(self.id_to_linked_id)
             return (e/n) + (1-e)*(1/(n-1))
         elif j in self.id_to_linked_id[k]:
             return (e/n) + (1-e)*(1/(len(self.id_to_linked_id[k])))

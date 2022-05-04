@@ -17,16 +17,13 @@ class Query:
         read_title_file(title, self.ids_to_titles)
         read_docs_file(doc_file, self.ids_to_pageranks)
         read_words_file(word_file, self.words_to_doc_relevance)
-        
-        
 
     def find_score(self, word):
         if word in self.words_to_doc_relevance:
-            for word in self.words_to_doc_relevance.keys():
-                for pageid in self.words_to_doc_relevance[word]:
-                    if pageid not in self.page_id_to_relevance:
-                        self.page_id_to_relevance[pageid] = 0
-                    self.page_id_to_relevance[pageid] += self.words_to_doc_relevance[word][pageid]
+            for pageid in self.words_to_doc_relevance[word]:
+                if pageid not in self.page_id_to_relevance:
+                    self.page_id_to_relevance[pageid] = 0
+                self.page_id_to_relevance[pageid] += self.words_to_doc_relevance[word][pageid]
     
     def stem_words(self, word):
         if word.lower() in set(stopwords.words('english')):
@@ -34,17 +31,17 @@ class Query:
         return self.nltk_test.stem(word.lower())
 
     def get_query(self, query):
+        self.page_id_to_relevance = {}
         split_input = query.split(" ")
-        
         for word in split_input:
-            words = self.stem_words(word)
-            if words != "":
-                self.find_score(words)
+            stemmed_word = self.stem_words(word)
+            if stemmed_word  != "":
+                self.find_score(stemmed_word)
         
         all_id = list(self.page_id_to_relevance.keys())
 
         if self.use_pagerank:
-            all_id.sort(reverse=True, key=lambda id: self.page_id_to_relevance[id] * self.ids_to_pageranks[id])
+            all_id.sort(reverse=True, key=lambda id: (self.page_id_to_relevance[id] * self.ids_to_pageranks[id]))
         else:
             all_id.sort(reverse=True, key=lambda id: self.page_id_to_relevance[id])
         
@@ -58,18 +55,17 @@ class Query:
     
     def repl(self):
         while True:
-            #print(sys.argv)
             inputs = input("search: ")
             if inputs == ":quit":
                 break
             self.get_query(inputs.lower())
+            
 
 if __name__ == "__main__":
     if len(sys.argv) == 5 and sys.argv[1] == "--pagerank":
         page_rank = True
         query = Query(page_rank, sys.argv[2], sys.argv[3], sys.argv[4])
         query.repl()
-    
     elif len(sys.argv) == 4: 
         page_rank = False 
         query = Query(page_rank, sys.argv[1], sys.argv[2], sys.argv[3])
