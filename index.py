@@ -30,7 +30,11 @@ class Index:
 
     def parse(self, input_file):
         '''
+        This method is responsible for populating many of the dictionaries used to implement the functionality for the Index class. We parse through and within each page of a file we store important information including:
+        the title, pageID, the word and it's frequency, along with the number of links a page has. 
+
         Parameters:
+        an xml file that the the program is going to be searching through 
 
         Returns: it doesn't return anthing but populates dictionaries 
         '''
@@ -43,6 +47,8 @@ class Index:
             pageID: int = int(wiki_page.find('id').text)
             self.IDs_to_title[pageID] = title.strip()
 
+        for wiki_page in wiki_xml_root:
+            pageID: int = int(wiki_page.find('id').text)
             page_text = wiki_page.find("text").text 
             tokenization_regex = r"\[\[[^\[]+?\]\]|[a-zA-Z0-9]+'[a-zA-Z0-9]+|[a-zA-Z0-9]+"
 
@@ -61,7 +67,7 @@ class Index:
                             if not pageID in self.id_to_linked_id:
                                 self.id_to_linked_id[pageID] = set()
                             self.id_to_linked_id[pageID].add(linked_ID)
-
+                            
                     for text in link_text:
                         text = self.process(text)
                         if text == "":
@@ -75,6 +81,7 @@ class Index:
                     aj = self.populate_word_to_id(word, pageID, aj)
                 
             self.tf_idf(pageID, aj)
+
     
     def process(self, word):
         '''
@@ -101,6 +108,12 @@ class Index:
         return bool(re.match(link_regex, word))
     
     def split_link(self, word):
+        '''Method is used to split a link so that we can identify that was is to the left of the link is what it's linking to while what's on its right is a word we are putting in the corpus
+        
+        Parameters: a link
+        
+        Returns: the link split into two components'''
+
         regex = r"[a-zA-Z0-9]+'[a-zA-Z0-9]+|[a-zA-Z0-9]+"
         stripped_word = word[2:-2]
 
@@ -115,6 +128,11 @@ class Index:
         return (re.findall(regex,text), title.strip())
 
     def populate_word_to_id(self, word, pageID, aj):
+        '''Helper method that is responsible for populating our word to id dictionary, this method is called in the parse method for every new word.
+        Parameters: a word, its associated pageID, and the max word count for that pageID
+        
+        Returns: The max count of a word for that pageID'''
+        
         if word in self.words_id_freq:
             if pageID in self.words_id_freq[word]:
                 self.words_id_freq[word][pageID] += 1        
@@ -145,7 +163,8 @@ class Index:
 
     def relevance_calculation(self):
         '''method that populates the idf dictionary by updating old values and
-        calculates the corresponding relevance values using the idf and td dictionaaries'''
+        calculates the corresponding relevance values using the idf and td dictionaries
+        '''
 
         for word in self.word_to_idf:
             self.word_to_idf[word] = math.log(self.total_docs/self.word_to_idf[word])
@@ -162,10 +181,9 @@ class Index:
         if k == j:
             return e/n
         elif k not in self.id_to_linked_id:
-            print(self.id_to_linked_id)
-            return (e/n) + (1-e)*(1/(n-1))
-        elif j in self.id_to_linked_id[k]:
-            return (e/n) + (1-e)*(1/(len(self.id_to_linked_id[k])))
+            return (e/n) + ((1-e)/(n-1))
+        elif j in self.id_to_linked_id[k] and k in self.id_to_linked_id:
+            return (e/n) + ((1-e)/(len(self.id_to_linked_id[k])))
         else:
             return e/n
 
@@ -186,10 +204,10 @@ class Index:
         while self.distance(r, self.id_to_page_rank):
             r = self.id_to_page_rank.copy()
 
-            for j in self.IDs_to_title.keys():
-                self.id_to_page_rank[j] = 0
-                for k in self.IDs_to_title.keys():
-                    self.id_to_page_rank[j] = self.id_to_page_rank[j] + (self.weight(k,j)*r[k]) 
+            for k in self.IDs_to_title.keys():
+                self.id_to_page_rank[k] = 0
+                for j in self.IDs_to_title.keys():
+                    self.id_to_page_rank[k] = self.id_to_page_rank[k] + (self.weight(j,k)*r[j]) 
             
 if __name__ == "__main__":
     input = sys.argv

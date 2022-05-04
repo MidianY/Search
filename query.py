@@ -51,7 +51,7 @@ class Query:
         num_results = min(10, len(all_id))
 
         for i in range(num_results):
-            print(self.ids_to_titles[all_id[i]])
+            print(str(i+1) + " " + self.ids_to_titles[all_id[i]])
     
     def repl(self):
         while True:
