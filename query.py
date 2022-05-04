@@ -9,12 +9,12 @@ from nltk.corpus import stopwords
 '''Query class handles user inputted query and produces up to the top 10 search results'''
 class Query:
     def __init__(self, pageRank, title, doc_file, word_file):
-        '''Query constructor
+        '''Query constructor. Initializes global variables and reads in files to populate respective dictionaries
         Parameters:
-        pageRank: a boolean. if true, reuslts will factor in pagerank
+        pageRank: a boolean. if true, results will factor in pagerank
         title: a txt file of the page IDs corresponding to the titles in a wiki
-        doc_file: a txt file of all the page IDs corresponign to their page rank
-        word_file: a txt file of all the words corresponfig to the page IDs they appear in to the relevance score
+        doc_file: a txt file of all the page IDs corresponding to their page rank
+        word_file: a txt file of all the words corresponding to the page IDs in which they appear to the respective relevance score
         '''
         self.ids_to_titles = {}
         self.ids_to_pageranks = {}
@@ -29,7 +29,7 @@ class Query:
     def find_score(self, word):
         '''Method that populates page_id_to_relevance for a given word
         Parameters: 
-        word : a processed string obtained from the query'''
+        word: a processed string'''
         if word in self.words_to_doc_relevance:
             for pageid in self.words_to_doc_relevance[word]:
                 if pageid not in self.page_id_to_relevance:
@@ -38,13 +38,16 @@ class Query:
     
     def stem_words(self, word):
         '''Method that processes (stems, removes stop words, make lower case) each word in the query
-        Paramters: word: a string obtained directly from the query'''
+        Parameters: 
+        word: a string obtained directly from the query
+        Returns:
+        processes word or empty string if given word is a stop word'''
         if word.lower() in set(stopwords.words('english')):
             return ""
         return self.nltk_test.stem(word.lower())
 
     def get_query(self, query):
-        '''Method that printd up to the top 10 most relevant titles for the given query
+        '''Method that prints up to the top 10 most relevant titles for the given query
         Parameters: 
         query: the query as given by the user'''
         self.page_id_to_relevance = {}
@@ -70,7 +73,7 @@ class Query:
             print(str(i+1) + " " + self.ids_to_titles[all_id[i]])
     
     def repl(self):
-        '''The REPL that runs until user quits'''
+        '''REPL that runs until user quits'''
         while True:
             inputs = input("search: ")
             if inputs == ":quit":
